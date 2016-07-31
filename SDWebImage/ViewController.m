@@ -13,8 +13,18 @@
 #import "DownloadImageCell.h"
 
 @interface ViewController ()
+/**
+ *  储存模型的数组
+ */
 @property(nonatomic,copy)NSMutableArray *appInfos;
+/**
+ *  操作
+ */
 @property(nonatomic,strong)NSOperationQueue *queue;
+/**
+ *  图片缓存的字典<key ： 图片地址， value：图片>
+ */
+@property(nonatomic,strong)NSMutableDictionary *imageCache;
 @end
 
 @implementation ViewController
@@ -46,6 +56,7 @@
         NSLog(@"请求失败： %@",error);
     }];
 }
+#pragma mark 懒加载
 -(NSOperationQueue *)queue{
     if (_queue == nil) {
         _queue = [[NSOperationQueue alloc]init];
@@ -58,6 +69,13 @@
     }
     return _appInfos;
 }
+-(NSMutableDictionary *)imageCache{
+    if (_imageCache == nil) {
+        _imageCache = [NSMutableDictionary dictionary];
+    }
+    return _imageCache;
+}
+#pragma mark 数据源方法
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return self.appInfos.count;
 }
@@ -71,8 +89,13 @@
     cell.downloadLabel.text = info.download;
     cell.iconImageView.image = nil;
     //判断模型里是否有图片  如果有就不用下载
-    if (info.image != nil) {
-        cell.iconImageView.image = info.image;
+    UIImage *cacheImage = self.imageCache[info.icon];
+    //判断字典中是否有图片
+    if (cacheImage != nil) {
+        //使用模型属性
+//        cell.iconImageView.image = info.image;
+        // 使用字典
+        cell.iconImageView.image = cacheImage;
         return cell;
     }
     NSBlockOperation *op = [NSBlockOperation blockOperationWithBlock:^{
@@ -85,7 +108,9 @@
         UIImage *image = [UIImage imageWithData:data];
         [[NSOperationQueue mainQueue]addOperationWithBlock:^{
 //            cell.imageView.image = image;
-            info.image = image;
+//            info.image = image;
+            //将图片缓存到字典中
+            [self.imageCache setValue:image forKey:info.icon];
             //刷新相对应的位置（indexPath）的cell
             [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationLeft];
         }];
@@ -96,5 +121,20 @@
 //    [cell.imageView sd_setImageWithURL:[NSURL URLWithString:info.icon]];
     return cell;
 }
-
+/**
+ * 收到内存警告:
+ 1. 将保存到内存中的图片清空
+ - 如果图片保存到模型中的话,需要遍历模型数组,去给模型的image属性设置nil
+ 2. 将队列中的操作全部取消
+ */
+-(void)didReceiveMemoryWarning{
+    [super didReceiveMemoryWarning];
+    for (int i = 0 ; i < self.appInfos.count; i++) {
+        InfoModel*info = [[InfoModel alloc]init];
+        info.image = nil;
+    }
+    [self.imageCache removeAllObjects];
+    //2.取消队列的所有操作
+    [self.queue cancelAllOperations];
+}
 @end
