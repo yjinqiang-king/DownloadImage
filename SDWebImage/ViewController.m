@@ -25,6 +25,10 @@
  *  图片缓存的字典<key ： 图片地址， value：图片>
  */
 @property(nonatomic,strong)NSMutableDictionary *imageCache;
+/**
+ *  下载操作的缓存  避免重复下载
+ */
+@property(nonatomic,strong)NSMutableDictionary *queueCache;
 @end
 
 @implementation ViewController
@@ -33,6 +37,7 @@
     [super viewDidLoad];
 //    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
     [self loadData];
+    [self cachePathWithUrlString:@"http://p16.qhimg.com/dr/48_48_/t0125e8d438ae9d2fbb.png"];
 }
 //加载网络数据
 -(void)loadData{
@@ -75,6 +80,12 @@
     }
     return _imageCache;
 }
+-(NSMutableDictionary *)queueCache{
+    if (_queueCache == nil) {
+        _queueCache = [NSMutableDictionary dictionary];
+    }
+    return _queueCache;
+}
 #pragma mark 数据源方法
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return self.appInfos.count;
@@ -98,11 +109,16 @@
         cell.iconImageView.image = cacheImage;
         return cell;
     }
+    // 判断操作是否存在,如果不存在,就去下载,如果存在,直接返回
+    if (self.queueCache[info.icon] != nil) {
+        NSLog(@"正在下载");
+        return cell;
+    }
     NSBlockOperation *op = [NSBlockOperation blockOperationWithBlock:^{
 //        [NSThread sleepForTimeInterval:arc4random_uniform(5)];
-        if (indexPath.row >= 9 ) {
-            [NSThread sleepForTimeInterval:3];
-        }
+//        if (indexPath.row >= 9 ) {
+            [NSThread sleepForTimeInterval:10];
+//        }
         NSLog(@"%@",[NSThread currentThread]);
         NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:info.icon]];
         UIImage *image = [UIImage imageWithData:data];
@@ -111,10 +127,14 @@
 //            info.image = image;
             //将图片缓存到字典中
             [self.imageCache setValue:image forKey:info.icon];
+            // 下载完成移除当前操作
+            [self.queueCache removeObjectForKey:info.icon];
             //刷新相对应的位置（indexPath）的cell
             [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationLeft];
         }];
     }];
+    // 缓存当前,避免在没下载完成之前,又拖动cell再次下载
+    [self.queueCache setObject:op forKey:info.icon];
     //返回cell的
     [self.queue addOperation:op];
     
@@ -136,5 +156,23 @@
     [self.imageCache removeAllObjects];
     //2.取消队列的所有操作
     [self.queue cancelAllOperations];
+    //3.移除所有操作
+    [self.queueCache removeAllObjects];
+}
+/**
+ *  通过图片的地址获取缓存的路径
+ *
+ *  @param urlString <#urlString description#>
+ *
+ *  @return <#return value description#>
+ */
+-(NSString*)cachePathWithUrlString:(NSString *)urlString{
+    //1.获取cache目录
+    NSString *cachePath = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstObject;
+    //2.获取文件名
+    NSString *name = [urlString lastPathComponent];
+    //3.拼接
+    NSString *res = [cachePath stringByAppendingPathComponent:name];
+    return res;
 }
 @end
