@@ -11,6 +11,7 @@
 #import "InfoModel.h"
 #import "UIImageView+WebCache.h"
 #import "DownloadImageCell.h"
+#import "NSString+path.h"
 
 @interface ViewController ()
 /**
@@ -109,11 +110,23 @@
         cell.iconImageView.image = cacheImage;
         return cell;
     }
+    //判断沙盒中是否有图片
+    //沙盒路径
+    NSString *cachePath = [info.icon appendCachePath];
+    //读取图片
+    cacheImage = [UIImage imageWithContentsOfFile:cachePath];
+    if (cacheImage != nil) {
+        NSLog(@"从沙盒中去图片");
+        [self.imageCache setObject:cacheImage forKey:info.icon];
+        cell.imageView.image = cacheImage;
+        return cell;
+    }
     // 判断操作是否存在,如果不存在,就去下载,如果存在,直接返回
     if (self.queueCache[info.icon] != nil) {
         NSLog(@"正在下载");
         return cell;
     }
+    
     NSBlockOperation *op = [NSBlockOperation blockOperationWithBlock:^{
 //        [NSThread sleepForTimeInterval:arc4random_uniform(5)];
 //        if (indexPath.row >= 9 ) {
@@ -122,6 +135,8 @@
         NSLog(@"%@",[NSThread currentThread]);
         NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:info.icon]];
         UIImage *image = [UIImage imageWithData:data];
+        //将数据写入沙盒
+        [data writeToFile:[info.icon appendCachePath] atomically:true];
         [[NSOperationQueue mainQueue]addOperationWithBlock:^{
 //            cell.imageView.image = image;
 //            info.image = image;

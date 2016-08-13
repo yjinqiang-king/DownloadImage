@@ -37,6 +37,7 @@
 		14FA35811D4DDF0A00894524 /* UIView+WebCacheOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 14FA356B1D4DDF0A00894524 /* UIView+WebCacheOperation.m */; };
 		14FA35841D4DDF4700894524 /* InfoModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 14FA35831D4DDF4700894524 /* InfoModel.m */; };
 		14FA35871D4E136B00894524 /* DownloadImageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 14FA35861D4E136B00894524 /* DownloadImageCell.m */; };
+		14FA358B1D4E82FB00894524 /* NSString+path.m in Sources */ = {isa = PBXBuildFile; fileRef = 14FA358A1D4E82FB00894524 /* NSString+path.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -100,6 +101,8 @@
 		14FA35831D4DDF4700894524 /* InfoModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InfoModel.m; sourceTree = "<group>"; };
 		14FA35851D4E136B00894524 /* DownloadImageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadImageCell.h; sourceTree = "<group>"; };
 		14FA35861D4E136B00894524 /* DownloadImageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadImageCell.m; sourceTree = "<group>"; };
+		14FA35891D4E82FB00894524 /* NSString+path.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+path.h"; sourceTree = "<group>"; };
+		14FA358A1D4E82FB00894524 /* NSString+path.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+path.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +136,7 @@
 		14F3D2E71D4CC47600305497 /* SDWebImage */ = {
 			isa = PBXGroup;
 			children = (
+				14FA35881D4E82FB00894524 /* CachePath */,
 				14F3D2EB1D4CC47600305497 /* AppDelegate.h */,
 				14F3D2EC1D4CC47600305497 /* AppDelegate.m */,
 				14F3D2EE1D4CC47600305497 /* ViewController.h */,
@@ -228,6 +232,16 @@
 			path = SDWebImage;
 			sourceTree = "<group>";
 		};
+		14FA35881D4E82FB00894524 /* CachePath */ = {
+			isa = PBXGroup;
+			children = (
+				14FA35891D4E82FB00894524 /* NSString+path.h */,
+				14FA358A1D4E82FB00894524 /* NSString+path.m */,
+			);
+			path = CachePath;
+			sourceTree = "<group>";
+			wrapsLines = 0;
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -312,6 +326,7 @@
 				14FA357A1D4DDF0A00894524 /* SDWebImagePrefetcher.m in Sources */,
 				14FA35811D4DDF0A00894524 /* UIView+WebCacheOperation.m in Sources */,
 				14FA357D1D4DDF0A00894524 /* UIImage+MultiFormat.m in Sources */,
+				14FA358B1D4E82FB00894524 /* NSString+path.m in Sources */,
 				14FA356D1D4DDF0A00894524 /* AFNetworkReachabilityManager.m in Sources */,
 				14F3D2EA1D4CC47600305497 /* main.m in Sources */,
 				14FA357B1D4DDF0A00894524 /* UIButton+WebCache.m in Sources */,
